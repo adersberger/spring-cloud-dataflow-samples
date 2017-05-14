@@ -1,0 +1,23 @@
+{
+  "properties": [
+    {
+      "name": "postgres.url",
+      "type": "java.lang.String",
+      "description": "URL to the Postgres database",
+      "defaultValue": "jdbc:postgresql://localhost:5432/stream"
+    },
+    {
+      "name": "postgres.user",
+      "type": "java.lang.String",
+      "description": "Postgres database user name",
+      "defaultValue": "postgres"
+    },
+    {
+      "name": "postgres.password",
+      "type": "java.lang.String",
+      "description": "Postgres database user password",
+      "defaultValue": "postgres"
+    }
+  ],
+  "hints": []
+}
