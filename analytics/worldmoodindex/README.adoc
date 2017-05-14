@@ -1,0 +1,12 @@
+# World Mood Index
+
+## References
+
+* Twitter sentiment analysis: http://rahular.com/twitter-sentiment-analysis
+* Sentiment analysis with StanfordNLP: http://www.programcreek.com/java-api-examples/index.php?api=edu.stanford.nlp.sentiment.SentimentCoreAnnotations
+
+## Coming up next...
+
+* Dockerized version deployable to Kubernetes: http://docs.spring.io/spring-cloud-dataflow-server-kubernetes/docs/current-SNAPSHOT/reference/htmlsingle/#_deploying_streams_on_kubernetes
+* Integrated monitoring: http://docs.spring.io/spring-cloud-dataflow/docs/1.2.0.BUILD-SNAPSHOT/reference/htmlsingle/#configuration-monitoring-management
+* Kotlin Wrapper for SCDF shell (http://docs.spring.io/spring-cloud-dataflow/docs/1.2.0.BUILD-SNAPSHOT/reference/htmlsingle/#_using_the_data_flow_template)
