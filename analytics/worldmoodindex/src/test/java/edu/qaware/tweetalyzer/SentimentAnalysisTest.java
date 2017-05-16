@@ -15,6 +15,7 @@
  */
 package edu.qaware.tweetalyzer;
 
+import com.twitter.Extractor;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.neural.rnn.RNNCoreAnnotations;
 import edu.stanford.nlp.pipeline.Annotation;
@@ -24,29 +25,43 @@ import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.util.CoreMap;
 import org.junit.Test;
 
+import java.io.IOException;
+import java.math.BigInteger;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 public class SentimentAnalysisTest {
 
+    public static final String SMALL_SAMPLE = "./tweets-sample-1000.log";
+    public static final String LARGE_SAMPLE = "tweets-sample-1000.log";
+
     @Test
-    public void testAnalysis() {
-        for (int i = 0; i < 1000; i++) {
-            String tweet = "I hate everybody around me!";
-            String tweet2 = "The world is lovely and the best world imaginable!";
-            String tweet3 = "I fucking hate everybody around me. They're from hell and morons!";
-            String tweet4 = "Sunny day today!";
+    public void testAnalysis() throws URISyntaxException, IOException {
 
-            StanfordCoreNLP pipeline = new StanfordCoreNLP("stanford-nlp.properties");
+        StanfordCoreNLP pipeline = new StanfordCoreNLP("stanford-nlp.properties");
+        Stream<String> lines = Files.lines(Paths.get(ClassLoader.getSystemResource(SMALL_SAMPLE).toURI()));
 
-            int sentiment = findSentiment(pipeline, tweet);
-            System.out.println(sentiment);
+        Map<Integer, BigInteger> histogram = new HashMap<>();
+        int i = 0;
 
-            int sentiment2 = findSentiment(pipeline, tweet2);
-            System.out.println(sentiment2);
+        for (String line : lines.collect(Collectors.toList())){
+            String tweetText = extractTweetText(line);
+            int sentiment = findSentiment(pipeline, tweetText);
+            System.out.println(sentiment + ": " + tweetText);
+            if (!histogram.containsKey(Integer.valueOf(sentiment))) histogram.put(sentiment, BigInteger.ONE);
+            else {
+                histogram.put(sentiment, histogram.get(sentiment).add(BigInteger.ONE));
+            }
+        }
 
-            int sentiment3 = findSentiment(pipeline, tweet3);
-            System.out.println(sentiment3);
-
-            int sentiment4 = findSentiment(pipeline, tweet4);
-            System.out.println(sentiment4);
+        for (Map.Entry<Integer, BigInteger> entry : histogram.entrySet()){
+            System.out.println(entry.getKey() + " -> " + entry.getValue());
         }
     }
 
@@ -78,6 +93,40 @@ public class SentimentAnalysisTest {
             }
         }
         return mainSentiment;
+    }
+
+    public static String extractTweetText(String line) {
+        //extract tweet JSON
+        String tweet = line.substring(line.indexOf('{'), line.length()-1);
+        final String START = "\"text\":\"";
+        String tweetTextFirst = tweet.substring(tweet.indexOf(START) + START.length(), tweet.length()-1);
+        String tweetText = tweetTextFirst.substring(0, tweetTextFirst.indexOf('"'));
+
+        //eliminate screen names
+        Extractor extractor = new Extractor();
+        List<String> names = extractor.extractMentionedScreennames(tweetText);
+        for (String name : names){
+            tweetText = tweetText.replace((CharSequence) name, "");
+        }
+
+        //eliminate standard syntax
+        tweetText = tweetText.replace("RT ", "");
+        tweetText = tweetText.replace("#", "");
+        tweetText = tweetText.replace("@", "");
+        tweetText = tweetText.replace(": ", "");
+
+        //eliminate links
+        tweetText = tweetText.replaceAll("https:[^ ]*", "");
+
+        //eliminate unicode chars and non-printable chars (e.g. emojis).
+        //Remember to detect sentiment based on emojis in an upcoming version.
+        tweetText = tweetText.replaceAll("\\\\u[a-z0-9]{4}", "");
+        tweetText = tweetText.replaceAll("\\\\n", " ");
+        tweetText = tweetText.replaceAll("\\\\", "");
+        tweetText = tweetText.replaceAll("&[a-z]*;", " ");
+        tweetText = tweetText.trim();
+
+        return tweetText;
     }
 
 }

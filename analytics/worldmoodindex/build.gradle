@@ -26,6 +26,7 @@ repositories {
 }
 
 dependencies {
+
 	//Spring Cloud dependencies
 	compile('org.springframework.cloud:spring-cloud-stream-binder-kafka')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
@@ -37,6 +38,14 @@ dependencies {
 	//Stanford NLP
 	compile group: 'edu.stanford.nlp', name: 'stanford-corenlp', version: "${stanfordNlpVersion}"
 	compile group: 'edu.stanford.nlp', name: 'stanford-corenlp', version: "${stanfordNlpVersion}", classifier: 'models'
+
+    //Google Guava
+	compile group: 'com.google.guava', name: 'guava', version: '21.0'
+
+	//Minimal JSON parser
+	compile group: 'com.eclipsesource.minimal-json', name: 'minimal-json', version: '0.9.4'
+
+
 }
 
 dependencyManagement {

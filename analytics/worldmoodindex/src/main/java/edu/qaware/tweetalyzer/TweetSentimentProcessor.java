@@ -54,6 +54,7 @@ public class TweetSentimentProcessor {
      * Spring Cloud Stream processor method for tweet sentiment analysis
      */
     public String analyzeSentiment(String tweet){
+
         String msg = "{\"mood\": \"" + findSentiment(tweet) + "\"}";
         System.out.println(msg);
         return msg;
